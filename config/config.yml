@@ -1,2 +1,6 @@
 llm:
-  api_url: https://router.huggingface.co/v1/chat/completions
+  model: gemini-2.5-flash
+  type: ChatGoogleGenerativeAI 
+
+conversations:
+  path: data/conversations
