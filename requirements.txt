@@ -1,2 +1,5 @@
 langchain
-langchain-google-genai
+transformers
+torch
+tf-keras
+sentence-transformers

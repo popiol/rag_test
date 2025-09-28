@@ -1,6 +1,27 @@
-llm:
+chat:
   model: gemini-2.5-flash
-  type: ChatGoogleGenerativeAI 
+  conversations_path: data/conversations
+  system_prompt: |
+    You will analyze a JSON document with order price and volume info for crypto currencies.
+    The document format is {"currency_pair": {
+    "a": [<ask_price>, <ask_whole_lot_volume>, <ask_lot_volume>],
+    "b": [<bid_price>, <bid_whole_lot_volume>, <bid_lot_volume>],
+    "c": [<closing_price>, <closing_lot_volume>],
+    "v": [<volume_today>, <volume_24h>],
+    "p": [<volume_weighted_price_today>, <volume_weighted_price_24h>],
+    "t": [<n_trades_today>, <n_trades_24h>],
+    "l": [<low_today>, <low_24h>],
+    "h": [<high_today>, <high_24h>],
+    "o": <opening_price>
+    }, ... }.
+  user_prompt: |
+    This is the document: {quotes}
+    Question: {question}
+  preparing_prompt: |
+    Identify which timestamps might be useful to answer the question. Select at most 2. If none are useful, say "None".
+    Return the selected timestamps as a comma-separated list. Each timestamp should be in the format YYYYMMDDHHMMSS.
+    The current timestamp is {current_timestamp}.
+    Question: {question}
 
-conversations:
-  path: data/conversations
+documents:
+  path: ../crypto_alerts/data/quotes

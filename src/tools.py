@@ -2,7 +2,8 @@ from functools import cached_property
 
 import yaml
 
-from src.llm import LLM
+from src.chat import Chat
+from src.documents import Documents
 
 
 class Tools:
@@ -15,5 +16,9 @@ class Tools:
             return yaml.load(f, Loader=yaml.FullLoader)
 
     @cached_property
-    def llm(self):
-        return LLM(**self.config["llm"], **self.secrets["llm"])
+    def chat(self):
+        return Chat(**self.config["chat"], **self.secrets["chat"])
+
+    @cached_property
+    def documents(self):
+        return Documents(**self.config["documents"])
