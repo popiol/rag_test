@@ -1,0 +1,2 @@
+llm:
+  api_url: https://router.huggingface.co/v1/chat/completions
