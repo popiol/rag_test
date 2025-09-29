@@ -2,7 +2,8 @@ chat:
   model: gemini-2.5-flash
   conversations_path: data/conversations
   system_prompt: |
-    You will analyze a JSON document with order price and volume info for crypto currencies.
+    You will analyze JSON documents with order price and volume info for crypto currencies.
+    Each document contains data from specific timestamp.
     The document format is {"currency_pair": {
     "a": [<ask_price>, <ask_whole_lot_volume>, <ask_lot_volume>],
     "b": [<bid_price>, <bid_whole_lot_volume>, <bid_lot_volume>],
@@ -15,7 +16,7 @@ chat:
     "o": <opening_price>
     }, ... }.
   user_prompt: |
-    This is the document: {quotes}
+    These are the documents: {quotes}
     Question: {question}
   preparing_prompt: |
     Identify which timestamps might be useful to answer the question. Select at most 2. If none are useful, say "None".

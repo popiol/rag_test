@@ -1,8 +1,6 @@
 import argparse
-from datetime import datetime
 
 from langchain_core.messages.utils import count_tokens_approximately
-from langchain_core.runnables.config import RunnableConfig
 
 from src.tools import Tools
 
@@ -12,35 +10,38 @@ class Runner:
         self.tools = tools
         self.conversation = self.tools.chat.conversation
 
-    def answer(self, question: str) -> str:
+    def answer(self, question: str):
         response = self.tools.chat.llm.invoke(
             self.tools.chat.preparing_prompt_langchain.invoke(
                 {
-                    "current_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "current_timestamp": self.tools.documents.max_timestamp,
                     "question": question,
                 }
             )
         )
-        print(response)
-        exit()
-        with open(
-            "../crypto_alerts/data/quotes/year=2025/month=08/day=21/20250821220006.json"
-        ) as f:
-            quotes = f.read().replace("{", "{{").replace("}", "}}")
-        inputs = {"quotes": quotes, "question": question}
-        config = RunnableConfig({"configurable": {"session_id": "session1"}})
-        response = self.conversation.invoke(inputs, config=config)
-        return response
+        print(f"Timestamp retrieval token count: {response.usage_metadata['total_tokens']}")
+        documents = self.tools.documents.find_closest(response.text())
+        quotes = []
+        timestamps = []
+        for timestamp, document in documents:
+            timestamp_str = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            timestamps.append(timestamp_str)
+            with open(document) as f:
+                data = f.read().replace("{", "{{").replace("}", "}}")
+                quotes.append(f"{timestamp_str}: {data}")
+        print("Using documents from timestamps:", ", ".join(str(ts) for ts in timestamps))
+        inputs = {"quotes": "\n".join(quotes), "question": question}
+        self.check_token_count(inputs)
+        response = self.conversation.invoke(inputs)
+        return f"used tokens: {response.usage_metadata}\n\n{response.text()}"
 
-    def check_token_count(self, inputs: dict, config: RunnableConfig) -> None:
+    def check_token_count(self, inputs: dict) -> None:
         n_tokens = sum(
-            [
-                count_tokens_approximately(p.invoke({**inputs, "history": []}))
-                for p in self.conversation.get_prompts(config=config)
-            ]
+            [count_tokens_approximately(p.invoke(inputs)) for p in self.conversation.get_prompts()]
         )
-        if n_tokens > 100_000:
-            print(f"Too many tokens: {n_tokens}")
+        print("Predicted token count:", n_tokens)
+        if n_tokens > 1000_000:
+            print("Too many tokens, aborting")
             exit()
 
 
