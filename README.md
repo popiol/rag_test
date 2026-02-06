@@ -49,4 +49,26 @@ Kraken quote documents should be organized as:
 documents/year=2024/month=01/day=15/20240115120000.json
 ```
 
-Filename format: `YYYYMMDDHHmmss.json`
+They are JSON files with format:
+
+```json
+{
+    "0GUSD": {
+        "a": [
+            "0.9780000",
+            "409",
+            "409.000"
+        ],
+        "b": [
+            "0.9770000",
+            "3583",
+            "3583.000"
+        ],
+        ...
+    },
+    "1INCHUSD": {
+        ...
+    },
+    ...
+}
+```
